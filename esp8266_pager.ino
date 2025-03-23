@@ -26,6 +26,52 @@ volatile bool isButtonReleased = false;
 void handleRoot();
 void handleNewMessage();
 
+void initPager()
+{
+  WiFi.begin(ssid, password);
+
+  lcd.init();
+  lcd.backlight();
+
+  lcd.setCursor(0, 0);
+  lcd.print("Connecting");
+  lcd.setCursor(0, 1);
+  lcd.print("to WiFi ...");
+
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    // wait until connected to wifi
+    delay(1000);
+  }
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Connected!");
+  lcd.setCursor(0, 1);
+  lcd.print(WiFi.localIP());
+  delay(2000);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Waiting for a");
+  lcd.setCursor(0, 1);
+  lcd.print("message...");
+
+  // not currently working
+  if (MDNS.begin("esp8266")) // Start the mDNS responder for esp8266.local
+  {              
+    Serial.println("mDNS responder started");
+  } else {
+    Serial.println("Error setting up MDNS responder!");
+  }
+
+  server.on("/", HTTP_GET, handleRoot);
+  server.on("/newMessage", HTTP_POST, handleNewMessage);
+
+  server.begin();
+  Serial.println("HTTP server started");
+}
+
 ICACHE_RAM_ATTR void buttonReleasedInterrupt()
 {
   unsigned long timeNow = millis();
@@ -53,7 +99,8 @@ void toggleLCDBacklight(bool turnOn)
 
 void checkLCDBacklight()
 {
-  if (isBacklightOn && (millis() - lastTimeLCDBacklightOn > LCDTimeOn))
+  unsigned long timeNow = millis();
+  if (isBacklightOn && (timeNow - lastTimeLCDBacklightOn > LCDTimeOn))
   {
     toggleLCDBacklight(false);
   }
@@ -68,7 +115,7 @@ void playNotificationSound()
 }
 
 void handleRoot()
-{                          // When URI / is requested, send a web page with a button to toggle the LED
+{
   server.send(200, "text/html", "<form action=\"/newMessage\" method=\"POST\"><input type=\"text\" name=\"newMessage\" placeholder=\"Some text...\"></br><input type=\"submit\" value=\"Send\"></form>");
 }
 
@@ -81,15 +128,11 @@ void handleNewMessage()
   String newMessage = server.arg("newMessage");
   lcd.clear();
   if (newMessage.length() > 16) {
-    // Display the first 16 characters on the first line
     lcd.setCursor(0, 0);
     lcd.print(newMessage.substring(0, 16));
-
-    // Display the remaining characters on the second line
     lcd.setCursor(0, 1);
     lcd.print(newMessage.substring(16));
   } else {
-    // If the string is shorter than or equal to 16 characters, display it on the first line
     lcd.setCursor(0, 0);
     lcd.print(newMessage);
   }
@@ -112,52 +155,7 @@ void setup()
                   buttonReleasedInterrupt,
                   FALLING);
 
-  WiFi.begin(ssid, password);
-
-  lcd.init();
-  lcd.backlight();
-
-  lcd.setCursor(0, 0);
-  lcd.print("Connecting");
-  lcd.setCursor(0, 1);
-  lcd.print("to WiFi ...");
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    // wait until connected to wifi
-    delay(1000);
-  }
-
-  Serial.println('\n');
-  Serial.println("Connection established!");  
-  Serial.print("IP address:\t");
-  Serial.println(WiFi.localIP());
-
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Connected!");
-  lcd.setCursor(0, 1);
-  lcd.print(WiFi.localIP());
-  delay(2000);
-
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Waiting for a");
-  lcd.setCursor(0, 1);
-  lcd.print("message...");
-
-  // not currently working
-  if (MDNS.begin("esp8266")) {              // Start the mDNS responder for esp8266.local
-    Serial.println("mDNS responder started");
-  } else {
-    Serial.println("Error setting up MDNS responder!");
-  }
-
-  server.on("/", HTTP_GET, handleRoot);        // Call the 'handleRoot' function when a client requests URI "/"
-  server.on("/newMessage", HTTP_POST, handleNewMessage); // Call the 'handleNewMessage' function when a POST request is made to URI "/newMessage"
-
-  server.begin();                            // Actually start the server
-  Serial.println("HTTP server started");
+  initPager();
 }
 
 void loop()
