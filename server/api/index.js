@@ -23,4 +23,4 @@ wss.on("connection", function connection(ws) {
 app.get("/", (req, res) => res.send("Hello World!"));
 console.log("Server started!");
 
-server.listen(port, () => console.log(`Listening on port ${port}`));
+server.listen(3000, () => console.log(`Listening on port ${3000}`));
