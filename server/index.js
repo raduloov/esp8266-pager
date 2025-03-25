@@ -20,4 +20,6 @@ wss.on("connection", function connection(ws) {
   });
 });
 
+app.get("/", (req, res) => res.send("Hello World!"));
+
 server.listen(port, () => console.log(`Listening on port ${port}`));

@@ -76,7 +76,7 @@
       </div>
     </div>
     <script>
-      const websocket = new WebSocket("ws://localhost:3000");
+      const websocket = new WebSocket("wss://esp8266-pager.vercel.app");
 
       websocket.addEventListener("open", function (event) {
         console.log("Hello server from client 1!");
