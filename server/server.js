@@ -7,6 +7,8 @@ const wss = new WebSocket.Server({ server });
 
 wss.on("connection", function connection(ws) {
   console.log("A new client connected!");
+
+  // added spaces to account for the 16x2 LCD screen
   ws.send("Connected to    WebSocket server");
 
   ws.on("message", function incoming(message, isBinary) {
@@ -21,7 +23,8 @@ wss.on("connection", function connection(ws) {
 });
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
+  // serve the html
+  res.sendFile(__dirname + "/page/index.html");
 });
 
 console.log("Server started!");

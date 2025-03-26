@@ -1,0 +1,65 @@
+html {
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  background-color: #000;
+}
+body {
+  margin: 0;
+}
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100svh;
+}
+.card {
+  background-color: #8e8e8e;
+  padding: 20px;
+  border-radius: 10px;
+}
+.input-container {
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  overflow: hidden;
+  height: 50px;
+}
+.input-container input {
+  flex: 1;
+  border: none;
+  height: 100%;
+  padding: 0 10px;
+  outline: none;
+  font-size: 20px;
+}
+.input-container button {
+  border: none;
+  background-color: #b764ff;
+  color: white;
+  display: flex;
+  width: 50px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  cursor: pointer;
+}
+.input-container button:hover {
+  background-color: #a33bff;
+}
+.status-text {
+  color: #8e8e8e;
+}
+.status-text span {
+  font-weight: bold;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  transform-origin: center;
+  animation: spin 0.5s linear infinite;
+}
