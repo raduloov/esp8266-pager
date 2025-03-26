@@ -27,6 +27,17 @@ const char* websocketServerPath = "/wss";
 WebSocketsClient webSocket;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
+byte Heart[] = {
+  B00000,
+  B00000,
+  B01010,
+  B11111,
+  B11111,
+  B01110,
+  B00100,
+  B00000,
+};
+
 ICACHE_RAM_ATTR void buttonReleasedInterrupt()
 {
   unsigned long timeNow = millis();
@@ -78,6 +89,24 @@ void handleNewMessage(uint8_t *value)
   String message = (char*)value;
 
   lcd.clear();
+
+  // initial message from server
+  if (message == "--WEBSOCKET SERVER: CONNECTED--")
+  {
+    lcd.setCursor(0, 0);
+    lcd.print(" ESP8266  Pager");
+    lcd.setCursor(0, 1);
+    lcd.write(byte(0));
+    lcd.write(byte(0));
+    lcd.print(" Connected! ");
+    lcd.write(byte(0));
+    lcd.write(byte(0));
+
+    attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonReleasedInterrupt, FALLING);
+
+    return;
+  }
+
   if (message.length() > 16)
   {
     lcd.setCursor(0, 0);
@@ -133,10 +162,13 @@ void setup()
                   FALLING);
 
   lcd.init();
+  lcd.createChar(0, Heart);
   lcd.backlight();
 
   lcd.setCursor(0, 0);
-  lcd.print("Connecting...");
+  lcd.print(" ESP8266  Pager");
+  lcd.setCursor(0, 1);
+  lcd.print("...Connecting...");
   
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED)
@@ -145,12 +177,6 @@ void setup()
   }
 
   Serial.println(WiFi.localIP());
-
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Connected to");
-  lcd.setCursor(0, 1);
-  lcd.print("websocket server");
 
   webSocket.beginSSL(websocketServerHost, websocketServerPort, websocketServerPath);
   webSocket.onEvent(webSocketEvent);
