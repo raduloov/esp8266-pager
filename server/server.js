@@ -1,7 +1,13 @@
 const express = require("express");
 const app = express();
+const path = require("path");
 const server = require("http").createServer(app);
 const WebSocket = require("ws");
+
+app.use("/public", express.static(path.join(__dirname, "public")));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 const wss = new WebSocket.Server({ server });
 
@@ -21,13 +27,6 @@ wss.on("connection", function connection(ws) {
     });
   });
 });
-
-app.get("/", (req, res) => {
-  // serve the html
-  res.sendFile(__dirname + "/page/index.html");
-});
-
-console.log("Server started!");
 
 const port = process.env.PORT || 3000;
 
