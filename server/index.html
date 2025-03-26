@@ -75,7 +75,7 @@
     <div class="wrapper">
       <div class="card">
         <div class="input-container">
-          <input type="input" id="input" placeholder="Type a message" />
+          <input type="input" id="input" maxlength="32" placeholder="Say hello :)" />
           <button id="button" onclick="sendNewMessage()">
             <svg id="send-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
               <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -113,7 +113,14 @@
 
     <script>
       const ws = new WebSocket("wss://esp8266-pager.onrender.com/");
+
       const statusEl = document.getElementById("status");
+      const sendIcon = document.getElementById("send-icon");
+      const loadingSpinner = document.getElementById("loading-spinner");
+      const input = document.getElementById("input");
+      const button = document.getElementById("button");
+
+      const MESSAGE_RECEIVED_RESPONE = "--ESP8266: Message received--";
 
       ws.onopen = function () {
         statusEl.textContent = "Connected";
@@ -122,9 +129,11 @@
 
       ws.onmessage = function (event) {
         console.log("Message from server:", event.data);
-        if (event.data.message === "--ESP8266: Message received--") {
-          document.getElementById("send-icon").style.display = "block";
-          document.getElementById("loading-spinner").style.display = "none";
+
+        if (event.data === MESSAGE_RECEIVED_RESPONE) {
+          sendIcon.style.display = "block";
+          loadingSpinner.style.display = "none";
+          button.disabled = false;
         }
       };
 
@@ -139,10 +148,13 @@
       };
 
       function sendNewMessage(e) {
-        document.getElementById("send-icon").style.display = "none";
-        document.getElementById("loading-spinner").style.display = "block";
-        const inputValue = document.getElementById("input").value;
-        ws.send(inputValue);
+        if (input.value === "") return;
+
+        sendIcon.style.display = "none";
+        loadingSpinner.style.display = "block";
+        button.disabled = true;
+
+        ws.send(input.value);
       }
     </script>
   </body>
