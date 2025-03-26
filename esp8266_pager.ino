@@ -93,6 +93,9 @@ void handleNewMessage(uint8_t *value)
 
   playNotificationSound();
 
+  // notify websocket server that message is received
+  webSocket.sendTXT("--ESP8266: Message received--");
+
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonReleasedInterrupt, FALLING);
 }
 
@@ -133,31 +136,21 @@ void setup()
   lcd.backlight();
 
   lcd.setCursor(0, 0);
-  lcd.print("Connecting");
-  lcd.setCursor(0, 1);
-  lcd.print("to WiFi ...");
+  lcd.print("Connecting...");
   
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
-    Serial.println("Connecting to WiFi..");
   }
 
   Serial.println(WiFi.localIP());
 
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("Connected!");
+  lcd.print("Connected to");
   lcd.setCursor(0, 1);
-  lcd.print(WiFi.localIP());
-  delay(2000);
-
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Waiting for a");
-  lcd.setCursor(0, 1);
-  lcd.print("message...");
+  lcd.print("websocket server");
 
   webSocket.beginSSL(websocketServerHost, websocketServerPort, websocketServerPath);
   webSocket.onEvent(webSocketEvent);
