@@ -53,6 +53,13 @@ body {
 .status-text span {
   font-weight: bold;
 }
+.error-text {
+  display: none;
+  color: #ff0000;
+}
+.error-text span {
+  font-weight: bold;
+}
 @keyframes spin {
   to {
     transform: rotate(360deg);
