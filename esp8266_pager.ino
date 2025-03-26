@@ -27,9 +27,6 @@ const char* websocketServerPath = "/wss";
 WebSocketsClient webSocket;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-// AsyncWebServer server(80);
-// AsyncWebSocket ws("/ws");
-
 ICACHE_RAM_ATTR void buttonReleasedInterrupt()
 {
   unsigned long timeNow = millis();
@@ -71,62 +68,6 @@ void playNotificationSound()
   tone(BUZZER_PIN, 1200, 350);
   delay(1000);
 }
-
-// void notifyClients()
-// {
-//   ws.textAll("1");
-// }
-
-// void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
-// {
-//   AwsFrameInfo *info = (AwsFrameInfo*)arg;
-//   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT)
-//   {
-//     data[len] = 0;
-
-//     detachInterrupt(digitalPinToInterrupt(BUTTON_PIN));
-
-//     toggleLCDBacklight(true);
-
-//     String newMessage = String((char*)data);
-//     lcd.clear();
-//     if (newMessage.length() > 16) {
-//       lcd.setCursor(0, 0);
-//       lcd.print(newMessage.substring(0, 16));
-//       lcd.setCursor(0, 1);
-//       lcd.print(newMessage.substring(16));
-//     } else {
-//       lcd.setCursor(0, 0);
-//       lcd.print(newMessage);
-//     }
-
-//     playNotificationSound();
-
-//     attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonReleasedInterrupt, FALLING);
-
-//     notifyClients();
-//   }
-// }
-
-// void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
-//              void *arg, uint8_t *data, size_t len)
-// {
-//   switch (type)
-//   {
-//     case WS_EVT_CONNECT:
-//       Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
-//       break;
-//     case WS_EVT_DISCONNECT:
-//       Serial.printf("WebSocket client #%u disconnected\n", client->id());
-//       break;
-//     case WS_EVT_DATA:
-//       handleWebSocketMessage(arg, data, len);
-//       break;
-//     case WS_EVT_PONG:
-//     case WS_EVT_ERROR:
-//     break;
-//   }
-// }
 
 void handleNewMessage(uint8_t *value)
 {
