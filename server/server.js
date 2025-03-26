@@ -15,7 +15,7 @@ wss.on("connection", function connection(ws) {
   console.log("A new client connected!");
 
   // added spaces to account for the 16x2 LCD screen
-  ws.send("Connected to    WebSocket server");
+  ws.send("--WEBSOCKET SERVER: CONNECTED--");
 
   ws.on("message", function incoming(message, isBinary) {
     console.log("received: %s", message);
