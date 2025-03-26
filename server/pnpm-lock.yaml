@@ -8,13 +8,12 @@ importers:
 
   .:
     dependencies:
-      ws:
-        specifier: ^8.18.1
-        version: 8.18.1
-    devDependencies:
       express:
         specifier: ^4.21.2
         version: 4.21.2
+      ws:
+        specifier: ^8.18.1
+        version: 8.18.1
 
 packages:
 

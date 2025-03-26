@@ -2,19 +2,16 @@
   "name": "esp8266_pager",
   "version": "1.0.0",
   "description": "",
-  "main": "api/index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node api/index.js",
-    "vercel-build": "echo hello from vercel-build"
+    "start": "node server"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.6.3",
-  "devDependencies": {
-    "express": "^4.21.2"
-  },
   "dependencies": {
+    "express": "^4.21.2",
     "ws": "^8.18.1"
   }
 }
