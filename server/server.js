@@ -20,7 +20,10 @@ wss.on("connection", function connection(ws) {
   });
 });
 
-app.get("/test", (req, res) => res.json({ message: "Hello World!" }));
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
+});
+
 console.log("Server started!");
 
 const port = process.env.PORT || 3000;

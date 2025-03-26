@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <WebSocketsClient.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
@@ -19,9 +20,15 @@ unsigned long buttonDebounceDelay = 50;
 bool isBacklightOn = true;
 volatile bool isButtonReleased = false;
 
-AsyncWebServer server(80);
-AsyncWebSocket ws("/ws");
+const char* websocketServerHost = "esp8266-pager.onrender.com";
+const uint16_t websocketServerPort = 443;
+const char* websocketServerPath = "/wss";
+
+WebSocketsClient webSocket;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+// AsyncWebServer server(80);
+// AsyncWebSocket ws("/ws");
 
 ICACHE_RAM_ATTR void buttonReleasedInterrupt()
 {
@@ -65,178 +72,109 @@ void playNotificationSound()
   delay(1000);
 }
 
-const char index_html[] PROGMEM = R"rawliteral(
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>esp8266 Pager</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      html {
-        font-family: Arial, Helvetica, sans-serif;
-        text-align: center;
-      }
-      h1 {
-        font-size: 1.8rem;
-        color: white;
-      }
-      h2 {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #143642;
-      }
-      .topnav {
-        overflow: hidden;
-        background-color: #143642;
-      }
-      body {
-        margin: 0;
-      }
-      .content {
-        padding: 30px;
-        max-width: 600px;
-        margin: 0 auto;
-      }
-      .card {
-        background-color: #f8f7f9;
-        box-shadow: 2px 2px 12px 1px rgba(140, 140, 140, 0.5);
-        padding-top: 10px;
-        padding-bottom: 20px;
-      }
-      .button {
-        padding: 15px 50px;
-        font-size: 24px;
-        text-align: center;
-        outline: none;
-        color: #fff;
-        background-color: #0f8b8d;
-        border: none;
-        border-radius: 5px;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-      }
-      /*.button:hover {background-color: #0f8b8d}*/
-      .button:active {
-        background-color: #0f8b8d;
-        box-shadow: 2 2px #cdcdcd;
-        transform: translateY(2px);
-      }
-      .state {
-        font-size: 1.5rem;
-        color: #8c8c8c;
-        font-weight: bold;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="topnav">
-      <h1>esp8266 Pager</h1>
-    </div>
-    <div class="content">
-      <div class="card">
-        <input type="input" id="input" placeholder="Type a message" />
-        <p><button id="button" class="button">Send message</button></p>
-      </div>
-    </div>
-    <script>
-      const gateway = `ws://${window.location.hostname}/ws`;
-      let websocket;
-      window.addEventListener("load", onLoad);
-      function initWebSocket() {
-        console.log("Trying to open a WebSocket connection...");
-        websocket = new WebSocket(gateway);
-        websocket.onopen = onOpen;
-        websocket.onclose = onClose;
-      }
-      function onOpen(event) {
-        console.log("Connection opened");
-      }
-      function onClose(event) {
-        console.log("Connection closed");
-        setTimeout(initWebSocket, 2000);
-      }
-      function onLoad(event) {
-        initWebSocket();
-        sendButton();
-      }
-      function sendButton() {
-        document.getElementById("button").addEventListener("click", e => sendNewMessage(e));
-      }
-      function sendNewMessage(e) {
-        const inputValue = document.getElementById("input").value;
-        console.log("Input Value:", inputValue);
-        websocket.send(inputValue);
-      }
-    </script>
-  </body>
-</html>
-)rawliteral";
+// void notifyClients()
+// {
+//   ws.textAll("1");
+// }
 
-void notifyClients()
-{
-  ws.textAll("1");
-}
+// void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
+// {
+//   AwsFrameInfo *info = (AwsFrameInfo*)arg;
+//   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT)
+//   {
+//     data[len] = 0;
 
-void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
+//     detachInterrupt(digitalPinToInterrupt(BUTTON_PIN));
+
+//     toggleLCDBacklight(true);
+
+//     String newMessage = String((char*)data);
+//     lcd.clear();
+//     if (newMessage.length() > 16) {
+//       lcd.setCursor(0, 0);
+//       lcd.print(newMessage.substring(0, 16));
+//       lcd.setCursor(0, 1);
+//       lcd.print(newMessage.substring(16));
+//     } else {
+//       lcd.setCursor(0, 0);
+//       lcd.print(newMessage);
+//     }
+
+//     playNotificationSound();
+
+//     attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonReleasedInterrupt, FALLING);
+
+//     notifyClients();
+//   }
+// }
+
+// void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
+//              void *arg, uint8_t *data, size_t len)
+// {
+//   switch (type)
+//   {
+//     case WS_EVT_CONNECT:
+//       Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+//       break;
+//     case WS_EVT_DISCONNECT:
+//       Serial.printf("WebSocket client #%u disconnected\n", client->id());
+//       break;
+//     case WS_EVT_DATA:
+//       handleWebSocketMessage(arg, data, len);
+//       break;
+//     case WS_EVT_PONG:
+//     case WS_EVT_ERROR:
+//     break;
+//   }
+// }
+
+void handleNewMessage(uint8_t *value)
 {
-  AwsFrameInfo *info = (AwsFrameInfo*)arg;
-  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT)
+  detachInterrupt(digitalPinToInterrupt(BUTTON_PIN));
+
+  toggleLCDBacklight(true);
+
+  String message = (char*)value;
+
+  lcd.clear();
+  if (message.length() > 16)
   {
-    data[len] = 0;
-
-    detachInterrupt(digitalPinToInterrupt(BUTTON_PIN));
-
-    toggleLCDBacklight(true);
-
-    String newMessage = String((char*)data);
-    lcd.clear();
-    if (newMessage.length() > 16) {
-      lcd.setCursor(0, 0);
-      lcd.print(newMessage.substring(0, 16));
-      lcd.setCursor(0, 1);
-      lcd.print(newMessage.substring(16));
-    } else {
-      lcd.setCursor(0, 0);
-      lcd.print(newMessage);
-    }
-
-    playNotificationSound();
-
-    attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonReleasedInterrupt, FALLING);
-
-    notifyClients();
+    lcd.setCursor(0, 0);
+    lcd.print(message.substring(0, 16));
+    lcd.setCursor(0, 1);
+    lcd.print(message.substring(16));
   }
-}
-
-void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
-             void *arg, uint8_t *data, size_t len)
-{
-  switch (type)
+  else
   {
-    case WS_EVT_CONNECT:
-      Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
-      break;
-    case WS_EVT_DISCONNECT:
-      Serial.printf("WebSocket client #%u disconnected\n", client->id());
-      break;
-    case WS_EVT_DATA:
-      handleWebSocketMessage(arg, data, len);
-      break;
-    case WS_EVT_PONG:
-    case WS_EVT_ERROR:
-    break;
+    lcd.setCursor(0, 0);
+    lcd.print(message);
   }
+
+  playNotificationSound();
+
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonReleasedInterrupt, FALLING);
 }
 
-void initWebSocket()
-{
-  ws.onEvent(onEvent);
-  server.addHandler(&ws);
+void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
+  switch (type) {
+    case WStype_DISCONNECTED:
+      Serial.println("[WSc] Disconnected!");
+      break;
+    case WStype_CONNECTED:
+      Serial.println("[WSc] Connected to WebSocket server!");
+      // Send a message after connecting
+      webSocket.sendTXT("Hello from ESP8266!");
+      break;
+    case WStype_TEXT:
+      Serial.printf("[WSc] Received text: %s\n", payload);
+      handleNewMessage(payload);
+      break;
+    case WStype_BIN:
+      Serial.printf("[WSc] Received binary data (%u bytes)\n", payload);
+      break;
+    default:
+      break;
+  }
 }
 
 void setup()
@@ -261,7 +199,7 @@ void setup()
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED)
   {
-    delay(1000);
+    delay(500);
     Serial.println("Connecting to WiFi..");
   }
 
@@ -280,20 +218,13 @@ void setup()
   lcd.setCursor(0, 1);
   lcd.print("message...");
 
-  initWebSocket();
-
-  // Route for root / web page
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-  {
-    request->send_P(200, "text/html", index_html);
-  });
-
-  server.begin();
+  webSocket.beginSSL(websocketServerHost, websocketServerPort, websocketServerPath);
+  webSocket.onEvent(webSocketEvent);
 }
 
 void loop()
 {
-  ws.cleanupClients();
+  webSocket.loop();
   
   checkLCDBacklight();
 
