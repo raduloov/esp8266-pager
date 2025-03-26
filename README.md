@@ -17,7 +17,7 @@ My first embedded project - an LCD display (with I2C module), buzzer and a butto
 - The display will be turned off after 10 seconds. A new message or manually pressing the button on the breadboard will turn the display on for 10 seconds.
 
 ## Developing
-I have used the [Arduino IDE](https://www.arduino.cc/en/software/) to write the C++ code for ESP8266 module.
+I have used the [Arduino IDE](https://www.arduino.cc/en/software/) to write the C++ code for the ESP8266 module.
 Required Arduino libraries:
 - **ESP Async TCP** 2.0.0 by ESP32Async
 - **WebSockets** 2.6.1 by Markus Sattler
