@@ -1,6 +1,5 @@
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
-#include <ESPAsyncWebServer.h>
 #include <WebSocketsClient.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
