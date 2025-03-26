@@ -7,7 +7,7 @@ const wss = new WebSocket.Server({ server });
 
 wss.on("connection", function connection(ws) {
   console.log("A new client connected!");
-  ws.send("Welcome client!");
+  ws.send("Connected to    WebSocket server");
 
   ws.on("message", function incoming(message, isBinary) {
     console.log("received: %s", message);

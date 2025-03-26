@@ -14,6 +14,7 @@
       }
       .wrapper {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         height: 100svh;
@@ -52,6 +53,22 @@
       .input-container button:hover {
         background-color: #a33bff;
       }
+      .status-text {
+        color: #8e8e8e;
+      }
+      .status-text span {
+        font-weight: bold;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .spin {
+        transform-origin: center;
+        animation: spin 0.5s linear infinite;
+      }
     </style>
   </head>
   <body>
@@ -60,7 +77,7 @@
         <div class="input-container">
           <input type="input" id="input" placeholder="Type a message" />
           <button id="button" onclick="sendNewMessage()">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
+            <svg id="send-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
               <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
               <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
               <g id="SVGRepo_iconCarrier">
@@ -73,15 +90,57 @@
                 ></path>
               </g>
             </svg>
+            <svg id="loading-spinner" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" style="display: none">
+              <circle
+                class="spin"
+                cx="400"
+                cy="400"
+                fill="none"
+                r="350"
+                stroke-width="50"
+                stroke="#ffffff"
+                stroke-dasharray="700 1400"
+                stroke-linecap="round"
+              />
+            </svg>
           </button>
         </div>
+      </div>
+      <div>
+        <p id="status-text" class="status-text">WebSocket status: <span id="status">Connecting...</span></p>
       </div>
     </div>
 
     <script>
       const ws = new WebSocket("wss://esp8266-pager.onrender.com/");
+      const statusEl = document.getElementById("status");
+
+      ws.onopen = function () {
+        statusEl.textContent = "Connected";
+        statusEl.style.color = "green";
+      };
+
+      ws.onmessage = function (event) {
+        console.log("Message from server:", event.data);
+        if (event.data.message === "--ESP8266: Message received--") {
+          document.getElementById("send-icon").style.display = "block";
+          document.getElementById("loading-spinner").style.display = "none";
+        }
+      };
+
+      ws.onerror = function (error) {
+        statusEl.textContent = "Error";
+        status.El.style.color = "red";
+      };
+
+      ws.onclose = function (event) {
+        statusEl.textContent = "Closed";
+        status.El.style.color = "red";
+      };
 
       function sendNewMessage(e) {
+        document.getElementById("send-icon").style.display = "none";
+        document.getElementById("loading-spinner").style.display = "block";
         const inputValue = document.getElementById("input").value;
         ws.send(inputValue);
       }
