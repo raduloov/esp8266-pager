@@ -5,7 +5,7 @@
 
 
 ## Description
-My first embedded project - an LCD display, buzzer and a button connected to a ESP8266 module via a breadboard. A simple websocket server with Express that serves a simple HTML page where the user can send a message that will be printed on the LCD display.
+My first embedded project - an LCD display (with I2C module), buzzer and a button connected to a ESP8266 module via a breadboard. A simple websocket server with Express that serves a simple HTML page where the user can send a message that will be printed on the LCD display.
 
 ## How it works / Features
 - When the ESP8266 module is connected to power, it will connect to a WiFi network. Connecting... and Connected text will be printed on the display.
@@ -15,3 +15,10 @@ My first embedded project - an LCD display, buzzer and a button connected to a E
 - On sending a message a loading spinner will be rendered on the send button. After receiving and displaying the message, the ESP8266 will send back a response to the server, informing the server that the button should be usable again.
 - A notification sound will be played through the buzzer on a new message.
 - The display will be turned off after 10 seconds. A new message or manually pressing the button on the breadboard will turn the display on for 10 seconds.
+
+## Developing
+I have used the [Arduino IDE](https://www.arduino.cc/en/software/) to write the C++ code for ESP8266 module.
+Required Arduino libraries:
+- **ESP Async TCP** 2.0.0 by ESP32Async
+- **WebSockets** 2.6.1 by Markus Sattler
+- **LiquidCrystal I2C** 1.1.2 by Frank de Brabander
