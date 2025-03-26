@@ -4,6 +4,7 @@ const path = require("path");
 const server = require("http").createServer(app);
 const WebSocket = require("ws");
 
+// serve the ui
 app.use("/public", express.static(path.join(__dirname, "public")));
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
@@ -14,7 +15,7 @@ const wss = new WebSocket.Server({ server });
 wss.on("connection", function connection(ws) {
   console.log("A new client connected!");
 
-  // added spaces to account for the 16x2 LCD screen
+  // inform ESP8266 that the WebSocket connection has been established
   ws.send("--WEBSOCKET SERVER: CONNECTED--");
 
   ws.on("message", function incoming(message, isBinary) {
