@@ -3,8 +3,8 @@
   <head>
     <title>esp8266 Pager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="/public/styles.css" />
-    <script src="/public/script.js" defer></script>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
   </head>
   <body>
     <div class="wrapper">
@@ -12,7 +12,16 @@
         <div class="input-container">
           <input type="input" id="input" maxlength="32" placeholder="Say hello :)" />
           <button id="button" onclick="sendNewMessage()">
-            <svg id="send-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
+            <svg
+              id="send-icon"
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              stroke="#ffffff"
+              style="width: 100px; height: 100px"
+            >
               <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
               <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
               <g id="SVGRepo_iconCarrier">
@@ -25,7 +34,14 @@
                 ></path>
               </g>
             </svg>
-            <svg id="loading-spinner" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" style="display: none">
+            <svg
+              id="loading-spinner"
+              width="40"
+              height="40"
+              viewBox="0 0 800 800"
+              xmlns="http://www.w3.org/2000/svg"
+              style="display: none; width: 100px; height: 100px"
+            >
               <circle
                 class="spin"
                 cx="400"
