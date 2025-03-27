@@ -21,7 +21,8 @@ body {
 .input-container {
   display: flex;
   align-items: center;
-  border-radius: 5px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
   overflow: hidden;
   height: 50px;
 }
@@ -42,6 +43,8 @@ body {
   align-items: center;
   justify-content: center;
   padding: 10px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
   cursor: pointer;
 }
 .input-container button:hover {
